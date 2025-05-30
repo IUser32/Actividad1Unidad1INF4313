@@ -21,8 +21,8 @@ namespace Ejercicio1.Controllers
         {
             if (ModelState.IsValid)
             {
-                ViewBag.Message = "El usuario ha sido registrado.";
-                return View(model);
+                TempData["Mensaje"] = "Usuario registrado correctamente.";
+                return RedirectToAction("Registrar");
             }
 
             return View(model);
