@@ -1,4 +1,4 @@
-namespace Ejercicio1.Models
+namespace ProyectoDePruebaMVC.Models
 {
     public class ErrorViewModel
     {

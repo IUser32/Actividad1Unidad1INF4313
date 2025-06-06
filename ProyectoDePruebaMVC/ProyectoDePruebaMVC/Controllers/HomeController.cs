@@ -1,8 +1,8 @@
 using System.Diagnostics;
-using Ejercicio1.Models;
 using Microsoft.AspNetCore.Mvc;
+using ProyectoDePruebaMVC.Models;
 
-namespace Ejercicio1.Controllers
+namespace ProyectoDePruebaMVC.Controllers
 {
     public class HomeController : Controller
     {
