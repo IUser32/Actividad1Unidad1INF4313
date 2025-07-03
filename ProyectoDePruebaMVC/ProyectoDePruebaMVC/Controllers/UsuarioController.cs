@@ -5,16 +5,11 @@ namespace ProyectoDePruebaMVC.Controllers
 {
     public class UsuarioController : Controller
     {
-        private static List<UsuarioViewModel> usuarios = new List<UsuarioViewModel>() 
-        { 
-            new UsuarioViewModel() { NombreUsuario = "lfortuna", Correo = "lfortuna@ufhec.edu.do", Contrasena = "123456" },
-            new UsuarioViewModel() { NombreUsuario = "jdejesus", Correo = "jdejesus@ufhec.edu.do", Contrasena = "123456" },
-            new UsuarioViewModel() { NombreUsuario = "lmorales", Correo = "lmorales@ufhec.edu.do", Contrasena = "123456" },
-            new UsuarioViewModel() { NombreUsuario = "wacosta", Correo = "wacosta@ufhec.edu.do", Contrasena = "123456" },
-            new UsuarioViewModel() { NombreUsuario = "dmontero", Correo = "dmontero@ufhec.edu.do", Contrasena = "123456" }
-        };
-        public UsuarioController()
+        private Prueba4313Context _context;
+
+        public UsuarioController(Prueba4313Context context)
         {
+            _context = context;
         }
 
         [HttpGet]
@@ -26,9 +21,16 @@ namespace ProyectoDePruebaMVC.Controllers
         [HttpGet]
         public IActionResult Lista()
         {
-            return View(usuarios);
-        }
+            var listaUsuarios = _context.Usuarios.Select(e => new UsuarioViewModel()
+            {
+                NombreUsuario = e.Username,
+                Contrasena = e.CurrentPassword,
+                Correo = e.Email,
+                ConfirmarContrasena = e.CurrentPassword
+            }).ToList();
 
+            return View(listaUsuarios);
+        }
 
         [HttpGet]
         public IActionResult Editar(string id)
@@ -40,7 +42,7 @@ namespace ProyectoDePruebaMVC.Controllers
                 return RedirectToAction("Lista");
             }
 
-            UsuarioViewModel usuarioActual = usuarios.FirstOrDefault(e => e.NombreUsuario.Equals(id));
+            var usuarioActual = _context.Usuarios.FirstOrDefault(e => e.Username.Equals(id));
 
             if (usuarioActual == null)
             {
@@ -49,7 +51,14 @@ namespace ProyectoDePruebaMVC.Controllers
                 return RedirectToAction("Lista");
             }
 
-            return View(usuarioActual);
+            var usuarioDto = new UsuarioViewModel() { 
+                NombreUsuario = usuarioActual.Username,
+                Contrasena = usuarioActual.CurrentPassword,
+                Correo = usuarioActual.Email,
+                ConfirmarContrasena = usuarioActual.CurrentPassword
+            };
+
+            return View(usuarioDto);
         }
 
         [HttpPost]
@@ -57,8 +66,26 @@ namespace ProyectoDePruebaMVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                usuarios.Add(model);
-                TempData["Mensaje"] = "Usuario registrado correctamente.";
+                var usuario = new Usuario()
+                {
+                    Username = model.NombreUsuario,
+                    Email = model.Correo,
+                    CurrentPassword = model.Contrasena
+                };
+
+                _context.Usuarios.Add(usuario);
+
+                var rowsCount = _context.SaveChanges();
+
+                if (rowsCount > 0)
+                {
+                    TempData["Mensaje"] = "Usuario registrado correctamente.";
+                }
+                else
+                {
+                    TempData["Mensaje"] = "Usuario no fue registrado correctamente.";
+                }
+
                 return RedirectToAction("Index");
             }
 
@@ -70,7 +97,7 @@ namespace ProyectoDePruebaMVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                UsuarioViewModel usuarioActual = usuarios.FirstOrDefault(e => e.NombreUsuario.Equals(model.NombreUsuario));
+                var usuarioActual = _context.Usuarios.FirstOrDefault(e => e.Username.Equals(model.NombreUsuario));
 
                 if (usuarioActual == null)
                 {
@@ -79,12 +106,21 @@ namespace ProyectoDePruebaMVC.Controllers
                     return RedirectToAction("Lista");
                 }
 
-                usuarioActual.NombreUsuario = model.NombreUsuario;
-                usuarioActual.ConfirmarContrasena = model.ConfirmarContrasena;
-                usuarioActual.Correo = model.Correo;
-                usuarioActual.Contrasena = model.Contrasena;
+                usuarioActual.Username = model.NombreUsuario;
+                usuarioActual.Email = model.Correo;
+                usuarioActual.CurrentPassword = model.Contrasena;
 
-                TempData["Mensaje"] = "Usuario editado correctamente.";
+                var rowsCount = _context.SaveChanges();
+
+                if (rowsCount > 0)
+                {
+                    TempData["Mensaje"] = "Usuario editado correctamente.";
+                }
+                else
+                {
+                    TempData["Mensaje"] = "Usuario no fue editado correctamente.";
+                }
+
                 return RedirectToAction("Index");
             }
 

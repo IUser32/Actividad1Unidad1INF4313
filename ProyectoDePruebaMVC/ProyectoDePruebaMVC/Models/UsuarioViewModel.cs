@@ -26,4 +26,9 @@ namespace ProyectoDePruebaMVC.Models
         public string ConfirmarContrasena { get; set; }
     }
 
+
+    /*
+     * 
+     Scaffold-DbContext "Server=LOCALHOST;Database=Prueba4313;Trusted_Connection=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Force  
+     */
 }
